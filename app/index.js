@@ -71,10 +71,14 @@ app.get('/rank', async (req, res) => {
   });
 });
 
-// app.get('/playerRank', async (req, res) => {
-//   const player = req.query.player;
-//   res.send(client.ZRANK())
-// });
+app.get('/playerRank', async (req, res) => {
+  const player = req.query.player;
+  client.ZRANK(leaderbord, player).then(function (result) {
+    res.send(JSON.stringify(result));
+  }).catch((err) => {
+    res.send(err)
+  });
+});
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
