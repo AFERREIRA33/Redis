@@ -66,7 +66,7 @@ app.get('/addScore', async (req, res) => {
 app.get('/rank', async (req, res) => {
   const leaderboard = client.zRangeByScore('leaderboard', 0, -1, 'WITHSCORES');
   leaderboard.then(function (result) {
-    console.log(leaderboard);
+    console.log(result);
   })
   res.send(client.zRangeByScore('leaderboard', 0, -1, 'WITHSCORES'));
 });
