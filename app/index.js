@@ -64,12 +64,17 @@ app.get('/addScore', async (req, res) => {
 });
 
 app.get('/rank', async (req, res) => {
-  const leaderboard = client.zRangeByScore('leaderboard', 0, -1, 'WITHSCORES');
-  leaderboard.then(function (result) {
-    console.log(result);
-  })
-  res.send(client.zRangeByScore('leaderboard', 0, -1, 'WITHSCORES'));
+  client.ZRANGE_WITHSCORES('leaderboard', 0, -1).then(function (result) {
+    res.send(JSON.stringify(result));
+  }).catch((err) => {
+    res.send(err)
+  });
 });
+
+// app.get('/playerRank', async (req, res) => {
+//   const player = req.query.player;
+//   res.send(client.ZRANK())
+// });
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
