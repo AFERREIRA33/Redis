@@ -55,6 +55,7 @@ app.get('/photos', async (req, res) => {
   }
 });
 
+// add a score with a player name
 app.get('/addScore', async (req, res) => {
   const score = req.query.score;
   const player = req.query.player;
@@ -63,6 +64,7 @@ app.get('/addScore', async (req, res) => {
 
 });
 
+// return all the player with her score
 app.get('/rank', async (req, res) => {
   client.ZRANGE_WITHSCORES('leaderboard', 0, -1).then(function (result) {
     res.send(JSON.stringify(result));
@@ -71,6 +73,7 @@ app.get('/rank', async (req, res) => {
   });
 });
 
+//return the rank of a specific player
 app.get('/playerRank', async (req, res) => {
   const player = req.query.player;
   await client.ZRANK('leaderboard', player).then(function (result) {
@@ -80,6 +83,8 @@ app.get('/playerRank', async (req, res) => {
     res.send(err)
   });
 });
+
+//return score of a specific player
 app.get('/playerScore', async (req, res) => {
   const player = req.query.player;
   await client.ZSCORE('leaderboard', player).then(function (result) {
