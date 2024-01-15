@@ -73,7 +73,8 @@ app.get('/rank', async (req, res) => {
 
 app.get('/playerRank', async (req, res) => {
   const player = req.query.player;
-  client.ZRANK(leaderbord, player).then(function (result) {
+  await client.ZRANK('leaderboard', player).then(function (result) {
+    console.log(result);
     res.send(JSON.stringify(result));
   }).catch((err) => {
     res.send(err)
