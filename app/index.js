@@ -80,6 +80,15 @@ app.get('/playerRank', async (req, res) => {
     res.send(err)
   });
 });
+app.get('/playerScore', async (req, res) => {
+  const player = req.query.player;
+  await client.ZSCORE('leaderboard', player).then(function (result) {
+    console.log(result);
+    res.send(JSON.stringify(result));
+  }).catch((err) => {
+    res.send(err)
+  });
+});
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
