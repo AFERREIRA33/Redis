@@ -14,9 +14,12 @@ const client = redis.createClient(6379);
   await client.connect();
 
   await client.ping();
+
+
 })();
 
 app.get('/', (req, res) => {
+
   res.send('Hello World!');
 });
 
@@ -32,6 +35,7 @@ app.get('/users', async (req, res) => {
     // Données non disponibles dans le cache, effectuez la requête
     const users = await axios.get('https://jsonplaceholder.typicode.com/users');
     client.setEx(cacheKey, 3600, JSON.stringify(users.data)); // Mettez en cache pendant 1 heure
+
     res.send(users.data);
   }
 });
@@ -39,7 +43,7 @@ app.get('/users', async (req, res) => {
 app.get('/photos', async (req, res) => {
   const cacheKey = 'photos';
   const data = await client.get(cacheKey);
-  
+
   if (data != null) {
     // Données en cache disponibles
     res.send(JSON.parse(data));
@@ -49,6 +53,22 @@ app.get('/photos', async (req, res) => {
     client.setEx(cacheKey, 3600, JSON.stringify(users.data)); // Mettez en cache pendant 1 heure
     res.send(users.data);
   }
+});
+
+app.get('/addScore', async (req, res) => {
+  const score = req.query.score;
+  const player = req.query.player;
+  client.ZADD('leaderboard', { score: score, value: player });
+  res.send("OK");
+
+});
+
+app.get('/rank', async (req, res) => {
+  const leaderboard = client.zRangeByScore('leaderboard', 0, -1, 'WITHSCORES');
+  leaderboard.then(function (result) {
+    console.log(leaderboard);
+  })
+  res.send(client.zRangeByScore('leaderboard', 0, -1, 'WITHSCORES'));
 });
 
 app.listen(3000, () => {
