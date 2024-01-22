@@ -95,6 +95,22 @@ app.get('/playerScore', async (req, res) => {
   });
 });
 
+
+app.get('/AddPlayer', async (req,res) => {
+  const player = req.query.player;
+
+  use('mflix');
+  var user = db.users.findOne({userName:player})
+  
+  if (user === null) {
+    db.users.insertOne({
+      "name": player
+    });
+  }
+});
+
+
+
 app.listen(3000, () => {
   console.log('Server is running on port 3000');
 });
