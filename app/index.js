@@ -4,7 +4,13 @@ const redis = require('redis');
 const mongoose = require('mongoose');
 
 const PlayerSchema = new mongoose.Schema({
-  name: String
+  name: String,
+  email: String,
+  tel: String,
+  userRating: new mongoose.Schema({
+    note: String,
+    comment: String
+  })
 });
 
 const Player = mongoose.model('Player', PlayerSchema);
@@ -66,7 +72,7 @@ app.get('/AddPlayer', async (req, res) => {
       res.send(existingPlayer);
     } else {
       // Si le joueur n'existe pas, crée un nouveau joueur et l'enregistre
-      const newPlayer = new Player({ "name": req.query.player });
+      const newPlayer = new Player({ "name": req.query.player, "email": req.query.email, "num_tel" :req.query.tel });
       await newPlayer.save();
 
 
@@ -85,6 +91,10 @@ app.get('/GetAllPlayer', async (req,res)=>{
 
   var listPlayer = await Player.find();
   res.send(listPlayer);
+})
+
+app.get('CommentPlayer', async(req,res)=>{
+  
 })
 
 app.get('/photos', async (req, res) => {
@@ -141,21 +151,6 @@ app.get('/playerScore', async (req, res) => {
     res.send(err)
   });
 });
-
-
-app.get('/AddPlayer', async (req, res) => {
-  const player = req.query.player;
-
-  use('mflix');
-  var user = db.users.findOne({ userName: player })
-
-  if (user === null) {
-    db.users.insertOne({
-      "name": player
-    });
-  }
-});
-
 
 
 app.listen(3000, () => {
