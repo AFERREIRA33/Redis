@@ -1,6 +1,7 @@
 const express = require('express');
 const axios = require('axios');
 const redis = require('redis');
+var mongo = require('mongodb');
 
 const app = express();
 const client = redis.createClient(6379);
@@ -96,12 +97,12 @@ app.get('/playerScore', async (req, res) => {
 });
 
 
-app.get('/AddPlayer', async (req,res) => {
+app.get('/AddPlayer', async (req, res) => {
   const player = req.query.player;
 
   use('mflix');
-  var user = db.users.findOne({userName:player})
-  
+  var user = db.users.findOne({ userName: player })
+
   if (user === null) {
     db.users.insertOne({
       "name": player
