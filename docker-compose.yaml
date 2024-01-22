@@ -10,3 +10,15 @@ services:
       - 8001:8001
     volumes:
       - ./redisinsight:/db
+
+  mongo:
+    image: mongo:6
+    container_name: mongo
+    restart: always
+    ports:
+      - 27017:27017
+    volumes:
+      - data:/data/db
+      - ./mflix:/mflix
+volumes:
+  data:
