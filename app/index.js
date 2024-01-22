@@ -1,10 +1,25 @@
 const express = require('express');
 const axios = require('axios');
 const redis = require('redis');
-var mongo = require('mongoose');
+const mongoose = require('mongoose');
+
+const PlayerSchema = new mongoose.Schema({
+  name: String
+});
+
+const Player = mongoose.model('Player', PlayerSchema);
 
 const app = express();
 const client = redis.createClient(6379);
+
+
+main().catch(err => console.log(err));
+
+async function main() {
+  await mongoose.connect('mongodb://localhost:27017');
+
+  // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
+}
 
 (async () => {
   client.on('error', (err) => {
@@ -40,6 +55,37 @@ app.get('/users', async (req, res) => {
     res.send(users.data);
   }
 });
+
+app.get('/AddPlayer', async (req, res) => {
+  try {
+    // Vérifie si le joueur existe déjà
+    var existingPlayer = await Player.findOne({ "name": req.query.player });
+
+    if (existingPlayer) {
+      // Si le joueur existe déjà, renvoie un message approprié
+      res.send(existingPlayer);
+    } else {
+      // Si le joueur n'existe pas, crée un nouveau joueur et l'enregistre
+      const newPlayer = new Player({ "name": req.query.player });
+      await newPlayer.save();
+
+
+
+      // Envoie la liste des joueurs en réponse
+      res.send("Player " + req.query.player + " was added");
+    }
+  } catch (error) {
+    // Gère les erreurs éventuelles
+    console.error(error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get('/GetAllPlayer', async (req,res)=>{
+
+  var listPlayer = await Player.find();
+  res.send(listPlayer);
+})
 
 app.get('/photos', async (req, res) => {
   const cacheKey = 'photos';
