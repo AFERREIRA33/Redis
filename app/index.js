@@ -42,12 +42,6 @@ async function main() {
 
 })();
 
-app.get('/', (req, res) => {
-
-  res.send('Hello World!');
-});
-
-
 app.get('/AddPlayer', async (req, res) => {
   try {
     // Vérifie si le joueur existe déjà
@@ -73,19 +67,19 @@ app.get('/AddPlayer', async (req, res) => {
   }
 });
 
-app.get('/GetAllPlayer', async (req,res)=>{
+app.get('/getAllPlayer', async (req,res)=>{
 
   var listPlayer = await Player.find();
   res.send(listPlayer);
 })
 
-app.get('/GetPlayer', async (req,res)=>{
+app.get('/getPlayer', async (req,res)=>{
 
   var listPlayer = await Player.findOne({ "name": req.query.player });
   res.send(listPlayer);
 })
 
-app.get('/CommentPlayer', async(req,res)=>{
+app.get('/commentPlayer', async(req,res)=>{
   var existingPlayer = await Player.findOne({ "name": req.query.player });
   if (!existingPlayer) {
     // Si le joueur existe déjà, renvoie un message approprié
@@ -106,7 +100,7 @@ app.get('/addScore', async (req, res) => {
   const score = req.query.score;
   const player = req.query.player;
   client.ZADD('leaderboard', { score: score, value: player });
-  res.send("OK");
+  res.send(req.query.player + " has now " + req.query.score + " points.");
 
 });
 
@@ -122,7 +116,7 @@ app.get('/rank', async (req, res) => {
 //return the rank of a specific player
 app.get('/playerRank', async (req, res) => {
   const player = req.query.player;
-  await client.ZRANK('leaderboard', player).then(function (result) {
+  await client.ZREVRANK('leaderboard', player).then(function (result) {
     console.log(result);
     res.send(JSON.stringify(result));
   }).catch((err) => {
