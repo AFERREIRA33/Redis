@@ -3,14 +3,16 @@ const axios = require('axios');
 const redis = require('redis');
 const mongoose = require('mongoose');
 
+const userRating = new mongoose.Schema({
+  note: String,
+  comment: String
+})
+
 const PlayerSchema = new mongoose.Schema({
   name: String,
   email: String,
   tel: String,
-  userRating: new mongoose.Schema({
-    note: String,
-    comment: String
-  })
+  userRating : [userRating]
 });
 
 const Player = mongoose.model('Player', PlayerSchema);
@@ -46,22 +48,6 @@ app.get('/', (req, res) => {
 });
 
 
-app.get('/users', async (req, res) => {
-  const cacheKey = 'users';
-  const data = await client.get(cacheKey);
-
-  if (data != null) {
-    // Données en cache disponibles
-    res.send(JSON.parse(data));
-  } else {
-    // Données non disponibles dans le cache, effectuez la requête
-    const users = await axios.get('https://jsonplaceholder.typicode.com/users');
-    client.setEx(cacheKey, 3600, JSON.stringify(users.data)); // Mettez en cache pendant 1 heure
-
-    res.send(users.data);
-  }
-});
-
 app.get('/AddPlayer', async (req, res) => {
   try {
     // Vérifie si le joueur existe déjà
@@ -72,7 +58,7 @@ app.get('/AddPlayer', async (req, res) => {
       res.send(existingPlayer);
     } else {
       // Si le joueur n'existe pas, crée un nouveau joueur et l'enregistre
-      const newPlayer = new Player({ "name": req.query.player, "email": req.query.email, "num_tel" :req.query.tel });
+      const newPlayer = new Player({ "name": req.query.player, "email": req.query.email, "tel" :req.query.tel, "userRating" : {"note" : "", "comment" : ""} });
       await newPlayer.save();
 
 
@@ -93,24 +79,27 @@ app.get('/GetAllPlayer', async (req,res)=>{
   res.send(listPlayer);
 })
 
-app.get('CommentPlayer', async(req,res)=>{
-  
+app.get('/GetPlayer', async (req,res)=>{
+
+  var listPlayer = await Player.findOne({ "name": req.query.player });
+  res.send(listPlayer);
 })
 
-app.get('/photos', async (req, res) => {
-  const cacheKey = 'photos';
-  const data = await client.get(cacheKey);
-
-  if (data != null) {
-    // Données en cache disponibles
-    res.send(JSON.parse(data));
+app.get('/CommentPlayer', async(req,res)=>{
+  var existingPlayer = await Player.findOne({ "name": req.query.player });
+  if (!existingPlayer) {
+    // Si le joueur existe déjà, renvoie un message approprié
+    res.send("This player doesn't exist !");
   } else {
-    // Données non disponibles dans le cache, effectuez la requête
-    const users = await axios.get('https://jsonplaceholder.typicode.com/photos');
-    client.setEx(cacheKey, 3600, JSON.stringify(users.data)); // Mettez en cache pendant 1 heure
-    res.send(users.data);
+    // Si le joueur n'existe pas, crée un nouveau joueur et l'enregistre
+    existingPlayer.userRating.push({ "note": req.query.note, "comment" :req.query.com });
+    await existingPlayer.save();
+
+    // Envoie la liste des joueurs en réponse
+    res.send("Comment to " + req.query.player + " was successufully added");
   }
-});
+})
+
 
 // add a score with a player name
 app.get('/addScore', async (req, res) => {
