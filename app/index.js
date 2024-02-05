@@ -118,7 +118,7 @@ app.get('/playerRank', async (req, res) => {
   const player = req.query.player;
   await client.ZREVRANK('leaderboard', player).then(function (result) {
     console.log(result);
-    res.send(JSON.stringify(result));
+    res.send(JSON.stringify(result+1));
   }).catch((err) => {
     res.send(err)
   });
@@ -135,6 +135,11 @@ app.get('/playerScore', async (req, res) => {
   });
 });
 
+app.get('/clearBase', async(req,res)=>{
+  var deleteAll = await Player.deleteMany();
+  client.flushAll()
+  res.send("All database Clear")
+})
 
 app.listen(3000, () => {
   console.log('Server is running on port 3000');

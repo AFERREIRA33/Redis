@@ -1,10 +1,10 @@
-localhost:3000/
+localhost:3000/clearBase
 localhost:3000/addPlayer?player=Billy&email=billy.Bl@gmail.com&tel=0754545454
 localhost:3000/addScore?player=Billy&score=10000
 localhost:3000/addPlayer?player=Arnaud&email=Arnaud.Ad@gmail.com&tel=0754545454
-localhost:3000/addScore?player=Arnaud&score=5000
+localhost:3000/addScore?player=Arnaud&score=1000
 localhost:3000/addPlayer?player=Jordan&email=Jordan.Jr@gmail.com&tel=0754545454
-localhost:3000/addScore?player=Jordan&score=1000
+localhost:3000/addScore?player=Jordan&score=5000
 localhost:3000/getAllPlayer
 localhost:3000/commentPlayer?player=Billy&note=10&com=I%20Love%20Cat
 localhost:3000/getPlayer?player=Billy
